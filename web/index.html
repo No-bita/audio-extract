@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Audio Extractor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+
+  <main class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <h1 class="app-title">YouTube Audio Extractor</h1>
+    </header>
+
+    <!-- Error Banner -->
+    <div id="error-banner" class="error-banner hidden" role="alert">
+      <div class="error-icon">⚠️</div>
+      <div class="error-content">
+        <strong id="error-title">Error</strong>
+        <p id="error-message">Something went wrong.</p>
+      </div>
+      <button id="btn-dismiss-error" class="btn-icon" aria-label="Dismiss error">✕</button>
+    </div>
+
+    <!-- VIEW 1: INPUT STATE -->
+    <section id="view-input" class="view-panel">
+      <div class="card glass-card">
+        <form id="inspect-form" class="input-form">
+          <label for="url-input" class="form-label">YouTube URL</label>
+          <div class="input-group">
+            <input
+              type="url"
+              id="url-input"
+              class="text-input"
+              placeholder="https://youtube.com/watch?v=..."
+              inputmode="url"
+              enterkeyhint="go"
+              autocapitalize="none"
+              autocomplete="off"
+              spellcheck="false"
+              required
+            />
+            <button type="submit" id="btn-inspect" class="btn btn-primary">
+              <span class="btn-text">Inspect</span>
+              <span class="btn-loader hidden"></span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- VIEW 2: CONFIGURE STATE -->
+    <section id="view-configure" class="view-panel hidden">
+      <div class="card glass-card">
+        <!-- Media Header -->
+        <div class="configure-nav-header">
+          <button id="btn-back-input" class="btn-back" type="button" aria-label="Go back to enter URL">
+            <span class="back-arrow">←</span>
+            <span>Back</span>
+          </button>
+        </div>
+
+        <div class="media-preview">
+          <img id="media-thumb" src="" alt="Thumbnail" class="media-thumb" />
+          <div class="media-details">
+            <h2 id="media-title" class="media-title">Video Title</h2>
+            <div class="media-meta">
+              <span id="media-channel" class="meta-tag channel-tag">Channel</span>
+              <span id="media-duration" class="meta-tag duration-tag">00:00</span>
+            </div>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- Operation Selection -->
+        <div class="operation-selection">
+          <div class="operation-cards">
+            <!-- Option 1: Full Audio -->
+            <label class="choice-card active" id="card-opt-full">
+              <input type="radio" name="operation" id="opt-full" value="full" checked />
+              <div class="choice-indicator"></div>
+              <div class="choice-content">
+                <div class="choice-title">Full Audio</div>
+              </div>
+            </label>
+
+            <!-- Option 2: Audio Clip -->
+            <label class="choice-card" id="card-opt-clip">
+              <input type="radio" name="operation" id="opt-clip" value="clip" />
+              <div class="choice-indicator"></div>
+              <div class="choice-content">
+                <div class="choice-title">Audio Clip</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Clip Timestamps -->
+        <div id="clip-config-panel" class="clip-config-panel hidden">
+          <!-- Video Preview Player -->
+          <div id="video-preview-wrapper" class="video-preview-wrapper">
+            <div class="video-player-frame">
+              <div id="yt-player-slot"></div>
+            </div>
+            <div class="time-capture-bar">
+              <button type="button" id="btn-set-start" class="btn-time-sync" title="Set Start to current video time">
+                <span>⏱ Set Start</span>
+              </button>
+              <button type="button" id="btn-set-end" class="btn-time-sync" title="Set End to current video time">
+                <span>⏱ Set End</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="timestamp-grid">
+            <div class="timestamp-field">
+              <label class="form-label" for="start-min">Start</label>
+              <div class="time-segment-box" id="start-segment-box">
+                <input
+                  type="text"
+                  id="start-min"
+                  class="time-segment mono"
+                  placeholder="00"
+                  value="00"
+                  maxlength="3"
+                  inputmode="numeric"
+                  enterkeyhint="next"
+                  autocomplete="off"
+                  aria-label="Start minutes"
+                />
+                <span class="time-colon" aria-hidden="true">:</span>
+                <input
+                  type="text"
+                  id="start-sec"
+                  class="time-segment mono"
+                  placeholder="00"
+                  value="00"
+                  maxlength="2"
+                  inputmode="numeric"
+                  enterkeyhint="next"
+                  autocomplete="off"
+                  aria-label="Start seconds"
+                />
+              </div>
+            </div>
+
+            <div class="timestamp-arrow" aria-hidden="true">➜</div>
+
+            <div class="timestamp-field">
+              <label class="form-label" for="end-min">End</label>
+              <div class="time-segment-box" id="end-segment-box">
+                <input
+                  type="text"
+                  id="end-min"
+                  class="time-segment mono"
+                  placeholder="00"
+                  value="00"
+                  maxlength="3"
+                  inputmode="numeric"
+                  enterkeyhint="next"
+                  autocomplete="off"
+                  aria-label="End minutes"
+                />
+                <span class="time-colon" aria-hidden="true">:</span>
+                <input
+                  type="text"
+                  id="end-sec"
+                  class="time-segment mono"
+                  placeholder="00"
+                  value="00"
+                  maxlength="2"
+                  inputmode="numeric"
+                  enterkeyhint="done"
+                  autocomplete="off"
+                  aria-label="End seconds"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="clip-summary-bar">
+            <span>Duration:</span>
+            <strong id="clip-calc-duration" class="mono">--:--</strong>
+          </div>
+        </div>
+
+        <!-- Submit Action -->
+        <div class="action-footer">
+          <button id="btn-generate" class="btn btn-primary btn-large">
+            <span class="btn-text">Generate MP3</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: PROCESSING STATE -->
+    <section id="view-processing" class="view-panel hidden">
+      <div class="card glass-card text-center">
+        <div class="pulse-loader-container">
+          <div class="pulse-ring"></div>
+          <div class="pulse-core">🎵</div>
+        </div>
+
+        <p id="stage-text" class="stage-text">Downloading audio stream...</p>
+      </div>
+    </section>
+
+    <!-- VIEW 4: COMPLETE STATE -->
+    <section id="view-complete" class="view-panel hidden">
+      <div class="card glass-card text-center">
+        <div class="success-icon-badge">✓</div>
+        <h2 class="complete-title">Ready</h2>
+
+        <div class="result-summary-box">
+          <div id="res-track-title" class="result-track">Song Title</div>
+          <div class="result-tags">
+            <span id="res-op-badge" class="meta-tag">Full Audio</span>
+            <span id="res-time-badge" class="meta-tag mono">03:32</span>
+          </div>
+        </div>
+
+        <!-- Audio Preview Player -->
+        <div class="audio-player-wrapper">
+          <audio id="audio-preview" controls preload="metadata" class="audio-player"></audio>
+        </div>
+
+        <div class="complete-actions">
+          <a id="btn-download" href="#" class="btn btn-primary btn-large" download>
+            <span>Download MP3</span>
+          </a>
+          <div class="action-grid">
+            <button id="btn-adjust-clip" class="btn btn-secondary">
+              <span>Adjust Timestamps</span>
+            </button>
+            <button id="btn-convert-another" class="btn btn-secondary">
+              <span>Convert Another</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

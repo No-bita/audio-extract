@@ -1,0 +1,33 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pytest
+.pytest_cache/
+
+# Local workspace directories (temporary audio files and caches)
+workspace/sources/
+workspace/jobs/
+workspace/temp/
+workspace/*.mp3
+workspace/*.opus
+workspace/*.m4a
+
+# Environment variables & local settings
+.env
+.env.local
+.venv/
+env/
+venv/
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo

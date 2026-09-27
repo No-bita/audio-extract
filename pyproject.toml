@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "yt-extractor"
+version = "0.1.0"
+description = "YouTube audio extraction and clipping tool"
+authors = [{ name = "Aaryan Shah" }]
+requires-python = ">=3.9"
+dependencies = [
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.28.0",
+    "yt-dlp>=2024.03.10",
+    "pydantic>=2.6.0"
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
