@@ -563,41 +563,7 @@ body {
   border: none;
 }
 
-.time-capture-bar {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
 
-.btn-time-sync {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: var(--text-main);
-  font-family: var(--font-sans);
-  font-size: 0.85rem;
-  font-weight: 600;
-  padding: 8px 12px;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  min-height: 40px;
-}
-
-.btn-time-sync:hover {
-  background: rgba(255, 62, 108, 0.15);
-  border-color: var(--accent-primary);
-  color: #ffffff;
-}
-
-.btn-time-sync:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  pointer-events: none;
-}
 
 .player-load-error {
   position: absolute;

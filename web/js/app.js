@@ -56,8 +56,6 @@
   const endMin = document.getElementById("end-min");
   const endSec = document.getElementById("end-sec");
   const clipCalcDuration = document.getElementById("clip-calc-duration");
-  const btnSetStart = document.getElementById("btn-set-start");
-  const btnSetEnd = document.getElementById("btn-set-end");
   const btnGenerate = document.getElementById("btn-generate");
 
   // Processing View Elements
@@ -170,26 +168,6 @@
 
   // --- Deterministic YouTube API & Player Lifecycle ---
 
-  function updateTimeSyncButtonsState() {
-    const isReady = state.ytPlayerReady && state.ytPlayer;
-    if (btnSetStart) {
-      btnSetStart.disabled = !isReady;
-      btnSetStart.title = isReady
-        ? "Set Start to current video time (playing or paused)"
-        : state.ytPlayerLoading
-        ? "Loading video preview..."
-        : "Preview not ready";
-    }
-    if (btnSetEnd) {
-      btnSetEnd.disabled = !isReady;
-      btnSetEnd.title = isReady
-        ? "Set End to current video time (playing or paused)"
-        : state.ytPlayerLoading
-        ? "Loading video preview..."
-        : "Preview not ready";
-    }
-  }
-
   let ytApiPromise = null;
   function loadYouTubeApi() {
     if (window.YT && window.YT.Player) {
@@ -233,7 +211,6 @@
 
     state.ytPlayerReady = false;
     state.ytPlayerLoading = true;
-    updateTimeSyncButtonsState();
 
     // Ensure wrapper is visible when starting
     if (videoPreviewWrapper) {
@@ -268,12 +245,10 @@
               console.warn("[YT Lifecycle] onReady fired but getCurrentTime() failed:", err);
               state.ytPlayerReady = false;
             }
-            updateTimeSyncButtonsState();
           },
           onError: (event) => {
             state.ytPlayerLoading = false;
             state.ytPlayerReady = false;
-            updateTimeSyncButtonsState();
             console.log("[YT Lifecycle] Embedding restricted or failed (code " + event.data + "). Hiding preview, keeping original flow.");
 
             // Hide the embedded video player wrapper completely to maintain the original clean flow
@@ -286,7 +261,6 @@
     } catch (err) {
       state.ytPlayerLoading = false;
       state.ytPlayerReady = false;
-      updateTimeSyncButtonsState();
       console.log("[YT Lifecycle] Failed to initialize preview. Hiding preview, keeping original flow:", err);
 
       // Hide the embedded video player wrapper completely
@@ -471,33 +445,6 @@
 
   setupSegmentInput(startMin, startSec);
   setupSegmentInput(endMin, endSec);
-
-  // Time Sync Buttons
-  function handleTimeCapture(minEl, secEl, targetBtn) {
-    const { time, error } = getPlayerCurrentTime();
-    if (time !== null) {
-      setTimeValues(minEl, secEl, time);
-      updateClipSummary();
-      flashButtonSuccess(targetBtn);
-      hideError();
-    } else {
-      if (error === "loading") {
-        showError("Player Loading", "Video preview is still loading. Please wait a moment.");
-      } else if (error === "not_ready") {
-        showError("Player Not Ready", "The video player is not ready yet. Please wait for the video to load.");
-      } else {
-        showError("Capture Failed", "Unable to read playback position. Try refreshing the video.");
-      }
-    }
-  }
-
-  if (btnSetStart) {
-    btnSetStart.addEventListener("click", () => handleTimeCapture(startMin, startSec, btnSetStart));
-  }
-
-  if (btnSetEnd) {
-    btnSetEnd.addEventListener("click", () => handleTimeCapture(endMin, endSec, btnSetEnd));
-  }
 
   // 2. Generate MP3 Submit
   btnGenerate.addEventListener("click", async () => {
